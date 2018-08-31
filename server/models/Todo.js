@@ -1,0 +1,26 @@
+const mongoose = require('mongoose')
+
+/**
+ * Todo
+ * @property { text } @type String
+ * @property { completed } @type Boolean
+ * @property { completedAt } @type Number
+ */
+const Todo = mongoose.model('Todo', {
+  text: {
+    type: String,
+    required: true,
+    minlength: 2,
+    trim: true
+  },
+  completed: {
+    type: Boolean,
+    default: false
+  },
+  completedAt: {
+    type: Number,
+    default: null
+  }
+})
+
+module.exports = { Todo }

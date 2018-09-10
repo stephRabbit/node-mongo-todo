@@ -12,23 +12,29 @@ app.use(bodyParser.json())
 
 // POST
 app.post('/todos', (req, res) => {
-  console.log(req.body)
   const todo = new Todo({
     text: req.body.text
   })
 
-  todo.save().then(doc => {
-    res.send(doc)
-  })
-  .catch(err => {
-    console.log('Unable to save todo: ', err)
-    res.status(400).send(err)
-  })
+  todo
+    .save()
+    .then(doc => res.send(doc))
+    .catch(err => {
+      // Unable to save todo!
+      res.status(400).send(err)
+    })
 })
 
 // GET
 app.get('/todos', (req, res) => {
-
+  Todo
+    .find()
+    .then(todos => {
+      res.send({ todos })
+    })
+    .catch(err => res.status(400).send(err))
 })
 
 app.listen(3000, () => console.log('Listening on PORT 3000...'))
+
+module.exports = { app }

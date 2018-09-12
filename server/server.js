@@ -1,4 +1,5 @@
 const express = require('express')
+const { ObjectID } = require('mongodb')
 const bodyParser = require('body-parser')
 
 const { mongoose } = require('./db/mongoose')
@@ -25,7 +26,7 @@ app.post('/todos', (req, res) => {
     })
 })
 
-// GET
+// GET /todos
 app.get('/todos', (req, res) => {
   Todo
     .find()
@@ -33,6 +34,26 @@ app.get('/todos', (req, res) => {
       res.send({ todos })
     })
     .catch(err => res.status(400).send(err))
+})
+
+// GET /todos/:id
+app.get('/todos/:id', (req, res) => {
+  const { id } = req.params
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send()
+  }
+
+  Todo
+    .findById(id)
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send()
+      }
+      res.send({ todo })
+    })
+    .catch(err => res.status(400).send())
+
 })
 
 app.listen(3000, () => console.log('Listening on PORT 3000...'))

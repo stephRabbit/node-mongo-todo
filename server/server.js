@@ -53,7 +53,6 @@ app.get('/todos/:id', (req, res) => {
       res.send({ todo })
     })
     .catch(err => res.status(400).send())
-
 })
 
 app.listen(3000, () => console.log('Listening on PORT 3000...'))

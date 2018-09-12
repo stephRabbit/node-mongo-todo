@@ -1,12 +1,19 @@
 const expect = require('expect')
 const request = require('supertest')
+const { ObjectID } = require('mongodb')
 
 const {app} = require('../server')
 const {Todo} = require('../models/Todo')
 
 const todos = [
-  { 'text': 'Todo 1' },
-  { 'text': 'Todo 2' }
+  {
+    '_id': new ObjectID(),
+    'text': 'Todo 1'
+  },
+  {
+    '_id': new ObjectID(),
+    'text': 'Todo 2'
+  }
 ]
 
 beforeEach(done => {
@@ -69,6 +76,34 @@ describe('GET /todos', () => {
       .expect(res => {
         expect(res.body.todos.length).toBe(2)
       })
+      .end(done)
+  })
+})
+
+describe('GET /todos/:id', () => {
+  it('should return todo doc', done => {
+    request(app)
+      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe(todos[0].text)
+      })
+      .end(done)
+  })
+
+  it('should return 404 when ID is valid but does not exist', done => {
+    const id = new ObjectID().toHexString()
+
+    request(app)
+      .get(`/todos/${id}`)
+      .expect(404)
+      .end(done)
+  })
+
+  it('should return 404 because of invalid ID', done => {
+    request(app)
+      .get('/todos/fakeID123')
+      .expect(404)
       .end(done)
   })
 })

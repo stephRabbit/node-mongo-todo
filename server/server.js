@@ -7,6 +7,7 @@ const { Todo } = require('./models/Todo')
 const { User } = require('./models/User')
 
 const app = express()
+const PORT = process.env.PORT || 3000
 
 // Middleware
 app.use(bodyParser.json())
@@ -55,6 +56,25 @@ app.get('/todos/:id', (req, res) => {
     .catch(err => res.status(400).send())
 })
 
-app.listen(3000, () => console.log('Listening on PORT 3000...'))
+// DELETE /todos/:id
+app.delete('/todos/:id', (req, res) => {
+  const { id } = req.params
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send()
+  }
+
+  Todo
+    .findOneAndDelete({ _id: id })
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send()
+      }
+      res.send({ todo })
+    })
+    .catch(err => res.status(400).send())
+})
+
+app.listen(PORT, () => console.log(`Listening on PORT: ${PORT}`))
 
 module.exports = { app }

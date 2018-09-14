@@ -107,3 +107,44 @@ describe('GET /todos/:id', () => {
       .end(done)
   })
 })
+
+describe('DELETE /todos/:id', () => {
+  it('should return the deleted todo', done => {
+    const hexId = todos[1]._id.toHexString()
+
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect(res => expect(res.body.todo._id).toBe(hexId))
+      .end((err, res) => {
+        if (err) {
+          return done(err)
+        }
+
+        Todo
+          .findById(hexId)
+          .then(todo => {
+            console.log('TODO: ', todo)
+            expect(todo).toNotExist()
+            done()
+          })
+          .catch(e => done(e))
+        })
+  })
+
+  it('should return 404 when ID is valid but does not exist', done => {
+    const id = new ObjectID().toHexString()
+
+    request(app)
+      .get(`/todos/${id}`)
+      .expect(404)
+      .end(done)
+  })
+
+  it('should return 404 because of invalid ID', done => {
+    request(app)
+      .get('/todos/fakeID123')
+      .expect(404)
+      .end(done)
+  })
+})

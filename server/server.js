@@ -3,7 +3,6 @@ const express = require('express')
 const { ObjectID } = require('mongodb')
 const bodyParser = require('body-parser')
 const R = require('ramda')
-const _ = require('lodash');
 
 const { mongoose } = require('./db/mongoose')
 const { Todo } = require('./models/Todo')
@@ -108,6 +107,24 @@ app.patch('/todos/:id', (req, res) => {
       res.send({ todo })
     })
     .catch(err => res.status(400).send())
+})
+
+// POST /users
+app.post('/users', (req, res) => {
+  const body = R.pick(['email', 'password'], req.body)
+  const user = new User(body)
+
+  // User.findByToken()
+
+  user.save().then(() => {
+    return user.generateAuthToken()
+  })
+  .then(token => {
+    res.header('x-auth', token).send(user)
+  })
+  .catch(e => {
+    res.status(400).send(e)
+  })
 })
 
 app.listen(PORT, () => console.log(`Listening on PORT: ${PORT}`))
